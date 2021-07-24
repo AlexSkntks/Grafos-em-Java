@@ -6,13 +6,14 @@ public class Main{
 
 	public static void main(String[] args){
 
-		Scanner scan;
+		Scanner scan = null;
 		try{
 			scan = new Scanner(new File("entrada.txt"));
 		}catch(FileNotFoundException e){
 			System.exit(1);
 		}
-	
+		
+		criaGrafo(scan, true);
 		
 	}
 
