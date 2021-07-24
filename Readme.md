@@ -1,7 +1,5 @@
 ## Como executar:
 
----
-
 ### Com o código fonte
 
 * Compile todo o código:
@@ -15,8 +13,6 @@
 * Observe que se arquivo de entrada não estiver na mesma pasta a última parte deve ser o caminho do arquivo (absoluto ou relativo) como no exemplo:
 
 	>`java Main /home/fulano/entrada.txt`
-
----
 
 ### Com um arquivo jar executável
 - Comando para criar o _programa.jar_ a partir do código fonte: 
