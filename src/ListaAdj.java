@@ -1,11 +1,25 @@
-import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.io.IOException;
 
 public class ListaAdj{
+
+	//Células da lista de Adjacẽncia
+	class Celula{
+		int vertice;//Vertice de chegada
+		int custo;
+
+		Celula(int vertice, int custo) {
+			this.vertice = vertice;
+			this.custo = custo;
+		}
+		//Métodos
+		int getVertice(){return vertice;}
+		int getCusto(){return custo;}
+	}
 	
 	ArrayList<Celula> lista;
+
 
 	ListaAdj (){
         lista = new ArrayList<Celula>();

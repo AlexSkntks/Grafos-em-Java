@@ -6,21 +6,21 @@ public class Main{
 
 	public static void main(String[] args){
 
-	
-		Scanner scanGrafo;
-		Scanner scanDigrafo;
+		Scanner scan = new Scanner(args[0]);
 
+		
 		try{
-			scanGrafo = new Scanner(new File("grafo_n_m.txt"));
-			criaGrafo(scanGrafo, true);
-
+			scan = new Scanner(new File(args[0]));
 		}catch(FileNotFoundException e){
-			try{
-				scanDigrafo = new Scanner(new File("digrafo_n_m.txt"));
-                criaGrafo(scanDigrafo, false);
-			}catch(FileNotFoundException r){
-				r.printStackTrace();
-			}
+			System.out.println("Caminho inválido ou arquivo inexistente. Encerrando...");
+			System.exit(1);
+		}
+
+
+		if (args[0].contains("/grafo")){
+			criaGrafo(scan, true);
+		}else if (args[0].contains("/digrafo")){
+			criaGrafo(scan, false);
 		}
 		
 	}
