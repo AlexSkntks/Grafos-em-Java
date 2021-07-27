@@ -1,155 +1,109 @@
 
-/** Tem que representar por matriz e por listas de adjacências :/ */
-
-/**
- * a) o arquivo de entrada: o nome do arquivo de entrada deve seguir o padrão:
- * 		grafo_n_m.txt (quando não for direcionado)
-			Sem direção com peso
-			Sem direção sem peso
- * 		digrafo_n_m.txt (quando for direcionado)
-			Com direção, com peso
-			Com direção, sem peso
- * b) os arquivos de saída: o nome do arquivo de saída deve seguir o padrão:
- * 		grafo_n_m.dot (quando não for direcionado e não valorado)
- *  	grafov_n_m.dot (quando não for direcionado e valorado)
- * 		digrafo_n_m.dot (quando for direcionado e não valorado)
- *		digrafov_n_m.dot (quando for direcionado e valorado)
-
-
-*/
-import java.util.Vector;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Grafo{
 
-	private int n;
-	private int m;
+	//private int inicio;
 
-	Vector<ListaAdj> vertices = new Vector<ListaAdj>();
-	MatrizAdj matriz;  
-
-	Grafo(int nVertices, int mArestas){
-		this.n = nVertices;
-		this.m = mArestas;
-
-        for(int i = 0; i < n; i++){
-			vertices.add(new ListaAdj());
-		}
-		matriz = new MatrizAdj(n);
-	}
-
-
-	void insereAdj(int nome, int chegada, int custo){
-
-		//Colocando na forma de lista de Adjacencia
-		vertices.get(nome-1).adicionaVertice(chegada, custo);
-
-		//Colocando na forma de matriz
-		matriz.addArestaMatriz(nome, chegada, custo);
-	}
-
-
-	void imprimeArestasMatriz(boolean graf, boolean cust) throws IOException{
-
-        if(graf == true){
-            if(cust == true){
-				//grafov_n_m.dot
-                matriz.imprimeMatrizComcustoGrafo(this.n);
-            }
-            else{
-                //grafo_n_m.dot
-                matriz.imprimeMatrizSemcustoGrafo(this.n);
-            }
-        }
-        else{
-            if(cust == true){
-				//digrafov_n_m.dot
-                matriz.imprimeMatrizComcustoDigrafo(this.n);
-            }
-            else{
-                //digrafo_n_m.dot
-                matriz.imprimeMatrizSemcustoDigrafo(this.n);
-            }
-        }
+	private class Vertice{
+		int nome;
+		int id;
+		int pai;//Id do "pai"
+		//ListaAdj lista = new ListaAdj();
 		
-	}
-
-	/*Uma função de impressão para cada tipo de grafo de acordo com a forma de representação*/
-	/*São oito funções*/
-
-	void imprimeArestasLista(boolean graf, boolean cust) throws IOException{
-		int count = 1;
-
-		File arquivo;
-
-		FileWriter fw; 
-
-		BufferedWriter bw;
-
-		if(graf == true){
-
-			if(cust == true){
-                //grafov_n_m.dot
-				arquivo = new File("grafov_n_m.dot");
-				fw = new FileWriter(arquivo);
-				bw = new BufferedWriter(fw);
-
-				bw.write("graph G\n{");
-				bw.newLine();
-
-				for(ListaAdj x: vertices){
-					x.imprimeComCustoGrafo(count++, bw);
-				}
-			}else{
-                //grafo_n_m.dot
-				arquivo = new File("grafo_n_m.dot");
-				fw = new FileWriter(arquivo);
-				bw = new BufferedWriter(fw);
-
-				bw.write("graph G\n{");
-				bw.newLine();
-
-				for(ListaAdj x: vertices){
-					x.imprimeSemCustoGrafo(count++, bw);
-				}
-			}
-			bw.write("}");
-			bw.newLine();
-		}else{
-
-			if(cust == true){
-                //digrafov_n_m.dot
-				arquivo = new File("digrafov_n_m.dot");
-				fw = new FileWriter(arquivo);
-				bw = new BufferedWriter(fw);
-
-				bw.write("digraph G\n{");
-				bw.newLine();
-
-				for(ListaAdj x: vertices){
-					x.imprimeComCustoDigrafo(count++, bw);
-				}
-			}else{
-
-                //digrafo_n_m.dot
-				arquivo = new File("digrafo_n_m.dot");
-				fw = new FileWriter(arquivo);
-				bw = new BufferedWriter(fw);
-
-				bw.write("digraph G\n{");
-				bw.newLine();
-
-				for(ListaAdj x: vertices){
-					x.imprimeSemCustoDigrafo(count++, bw);
-				}
-			}
-			bw.write("}");
-			bw.newLine();
+		Vertice(int nome, int id, int pai){
+			this.nome = nome;
+			this.id = id;
+			this.pai = pai;
 		}
-		bw.close();
-		fw.close();
+
+		public int getId(){return id;}
+		public int getNome(){return nome;}
+		public int getPai(){return pai;}
+		//void adicionaAdj(int nome, int id){lista.adicionaVertice(nome, id);}
 	}
+
+	LinkedList<Vertice> vertices = new LinkedList<Vertice>();
+
+
+	Grafo(int inicio){//O grafo inicialmente só tem um nó
+		//this.inicio = inicio;
+		Vertice vertice = new Vertice(inicio, 0, -1);//Seria o nó Raiz
+		this.vertices.add(vertice);
+	}
+
+	void adicionaVertice(Vertice v){
+		vertices.add(v);
+	}
+
+	static private int inverte(int num){
+
+		if(num > 0 && num < 10){
+			return num;
+		}
+		int alg1 = num/100;
+		num %= 100;
+		int alg2 = num/10;
+		int alg3 = num%10;
+
+		String aux;
+		if (alg3 == 0 && alg2 == 0){
+			aux = new String(Integer.toString(alg1));
+		}else {
+			aux = new String(Integer.toString(alg3) + Integer.toString(alg2) + Integer.toString(alg1));
+		}
+		
+		
+		return Integer.parseInt(aux);
+	}
+
+	int constroi(int vertice){//Percorre o grafo, enquanto cria os vetices
+
+		Queue<Vertice> fila = new LinkedList<>();
+		int indice = 0;
+		int nome;
+		fila.add(vertices.get(0));
+		
+		while (true) {
+			Vertice v = fila.poll();
+
+			if(v.getNome() == vertice){
+				return v.getId();
+			}
+			//System.out.print("Sou o vertice: " + v.getNome() + " Filho: ");
+
+			//Cria filho da esquerda
+			nome = inverte(v.getNome());
+
+			if(!(nome > 0 && nome < 10)){//Verifica se na esquerda é um número de um algarismo
+				//System.out.print("Esq: " + nome);
+				Vertice esq = new Vertice(nome, ++indice, v.getId());
+				//esq.adicionaAdj(nome, indice);
+				adicionaVertice(esq);
+				fila.add(esq);
+			}
+
+			//Cria filho da direita
+			nome = v.getNome() + 1;
+			//System.out.println(", Dir: " + nome);
+			Vertice dir = new Vertice(nome, ++indice, v.getId());
+			//dir.adicionaAdj(nome, indice);
+			adicionaVertice(dir);
+			fila.add(dir);
+
+
+		}
+	}
+
+	int calculaCliques(int id){
+		int count = 0;
+		while (vertices.get(id).getPai() != -1) {
+			id = vertices.get(id).getPai();
+			count++;
+		}
+		return count;
+	}
+
+
 }

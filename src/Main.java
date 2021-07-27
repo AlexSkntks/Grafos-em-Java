@@ -1,86 +1,186 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Scanner;
-public class Main{
+import java.util.Vector;
 
-	public static void main(String[] args){
+import java.io.FileNotFoundException;
+import java.util.LinkedList;
+import java.util.Queue;
 
-		Scanner scan = null;
-		try{
-			scan = new Scanner(new File("entrada.txt"));
-		}catch(FileNotFoundException e){
-			System.exit(1);
+class Grafo{
+
+	//private int inicio;
+
+	private class Vertice{
+		int nome;
+		int id;
+		int pai;//Id do vértice pai
+		int altura;//Tamanho do percurso até a raiz
+		
+		Vertice(int nome, int id, int pai, int altura){
+			this.nome = nome;
+			this.id = id;
+			this.pai = pai;
+			this.altura = altura;
 		}
-		
-		criaGrafo(scan, true);
-		
+
+		public int getId(){return id;}
+		public int getNome(){return nome;}
+		public int getPai(){return pai;}
+		public int getAltura(){return altura;}
 	}
 
-    static private void criaGrafo(Scanner scan, boolean graf){
-        
+	Vector<Vertice> vertices = new Vector<Vertice>();
+	Queue<Vertice> fila = new LinkedList<>();
+	//LinkedList<Vertice> vertices = new LinkedList<Vertice>();
 
-        System.out.println("Escolha 1 para representação em matriz ou 2 para representação em lista");
-		Scanner leitura = new Scanner(System.in);
-        int choice = 0;
 
-        while(choice != 1 && choice != 2){
-            choice = leitura.nextInt();
-            if(choice != 1 && choice != 2){
-                System.out.println("Numero incorreto!! favor digitar os valores contidos no programa!");
-            }
-        }
+	Grafo(int inicio){//O grafo inicialmente só tem um nó
+		//this.inicio = inicio;
+		Vertice vertice = new Vertice(inicio, 0, 0, 0);//Seria o nó Raiz
+		this.vertices.add(vertice);
+	}
 
-        boolean flagcusto = false;
+	void adicionaVertice(Vertice v){
+		vertices.add(v);
+	}
 
-        String linha;
-		String[] valores;
-		int n = 0;
-		int m = 0;
+	static private int inverte(int num){
+		int aux = num;
 
-        //Rotina que ignora os comentários e lê a primeira linha
-		while (scan.hasNextLine()) {
-			linha = scan.nextLine();
-			if (!linha.contains("c ")){
-				valores = linha.split(" ");
-				n = Integer.parseInt(valores[0]);
-				m = Integer.parseInt(valores[1]);
-				break;
-			}
+		if(aux > 0 && aux < 10){//Trata números de um algarismo
+			return aux;
 		}
 
-		Grafo grafo = new Grafo(n, m);
+		Integer[] numero = new Integer[5];
 
-		//Rotina que lê as arestas, ignora qualquer linha de comentário
-		int aux = m;
-		while(scan.hasNextLine() && aux != 0){
-			linha = scan.nextLine();
-			if (!linha.contains("c ")){
-				valores = linha.split(" ");
-				int v1 = Integer.parseInt(valores[0]);
-				int v2 = Integer.parseInt(valores[1]);
-				int custo = Integer.parseInt(valores[2]);
 
-                if(custo > 0){
-                    flagcusto = true;
-                }
-				grafo.insereAdj(v1, v2, custo);
-                
-				aux--;
-			}
+		int i = 0;//Tamanho do número
+		//Rotina que armazena os caracteres de forma invertida no vetor
+		for(int j = 0; aux > 0; i++){
+			j *= 10;
+			numero[i] = (aux%10);
+			aux /= 10;
 		}
 
-		try{
-			if(choice == 1){
-				grafo.imprimeArestasMatriz(graf, flagcusto);
-			}
-			else{
-				grafo.imprimeArestasLista(graf, flagcusto);
-			}
-		}catch(IOException e){
-			e.printStackTrace();
+		String number = new String();
+
+		//Coloca o número em uma string
+		for(int j = 0; j < i; j++){
+			number += Integer.toString(numero[j]);	
 		}
 
-    
-    }
+		//Converte a string em Int e retorna
+		return Integer.parseInt(number);
+	}
+
+
+	private void verificaRepeticao(int nome){
+		for(Vertice x: fila){
+			if(x.getNome() == nome){
+				fila.remove(x);
+				return;
+			}
+		}
+	}
+
+	static private boolean qtdAlgarismosIguais(int num1, int num2){
+
+		int j = 0, i = 0;
+		int tamN1 = 0;
+		int tamN2 = 0;
+
+		while (num1 > 0) {
+			j *= 10;
+			j = (num1%10);
+			num1 /= 10;
+			tamN1++;
+		}
+
+		while (num2 > 0) {
+			j *= 10;
+			j = (num2%10);
+			num2 /= 10;
+			tamN2++;
+		}
+
+		if(tamN1 >= tamN2){
+			return true;
+		}else{
+			return false;
+		}
+
+	}
+
+	boolean verificaVerticeExistente(int nome){
+		for(Vertice v: vertices){
+			if(v.getNome() == nome){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	int constroi(int vertice){//Percorre o grafo, enquanto cria os vetices
+
+		
+		int indice = 0;
+		int nome;
+		fila.add(vertices.get(0));
+		
+		while (true) {
+			Vertice v = fila.poll();
+
+			//System.out.print("Sou o vertice " + v.getNome() + " Filho: ");
+
+			//Cria filho da esquerda
+			nome = inverte(v.getNome());
+				if(nome != v.getNome() && qtdAlgarismosIguais(nome, v.getNome())){
+					if(verificaVerticeExistente(nome)){//Só vai criar se o vertice não existe
+						Vertice esq = new Vertice(nome, ++indice, v.getId(), v.getAltura()+1);
+						//verificaRepeticao(nome);//Remove da fila algum vertice que vai gerar a mesma arvore
+						//System.out.print("Esq " + nome);
+						adicionaVertice(esq);
+						if(nome == vertice){
+							return esq.getAltura();
+						}
+						fila.add(esq);
+					}
+				}
+			
+			//Cria filho da direita
+			nome = v.getNome() + 1;
+			Vertice dir = new Vertice(nome, ++indice, v.getId(), v.getAltura()+1);
+			//verificaRepeticao(nome);//Remove da fila algum vertice que vai gerar a mesma arvore
+			//System.out.println(" Dir " + nome);
+			adicionaVertice(dir);
+			if(nome == vertice){
+				return dir.getAltura();
+			}
+			fila.add(dir);
+		}
+	}
+}
+
+
+public class Main{
+
+	public static void main(String[] args) throws FileNotFoundException{
+
+		Scanner scan = null;
+		int testes;
+		int inicio, fim;
+		
+		scan = new Scanner(System.in);
+		testes = scan.nextInt();
+
+		Grafo g;
+
+		for(int i = 0; i < testes; i++){
+			inicio = scan.nextInt();
+			fim = scan.nextInt();
+			g = new Grafo(inicio);
+			//System.out.println();
+			System.out.println(g.constroi(fim));
+		}
+		
+	}
 }
