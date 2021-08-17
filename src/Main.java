@@ -1,46 +1,34 @@
 import java.util.Scanner;
-import java.util.Vector;
-
-import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
 class Grafo{
 
-	//private int inicio;
+	private int inicio;
+	HashMap<Integer, Vertice> map = new HashMap<Integer, Vertice>();
 
 	private class Vertice{
 		int nome;
-		int id;
-		int pai;//Id do vértice pai
 		int altura;//Tamanho do percurso até a raiz
 		
-		Vertice(int nome, int id, int pai, int altura){
+		Vertice(int nome, int altura){
 			this.nome = nome;
-			this.id = id;
-			this.pai = pai;
 			this.altura = altura;
 		}
 
-		public int getId(){return id;}
 		public int getNome(){return nome;}
-		public int getPai(){return pai;}
 		public int getAltura(){return altura;}
 	}
 
-	Vector<Vertice> vertices = new Vector<Vertice>();
-	Queue<Vertice> fila = new LinkedList<>();
-	//LinkedList<Vertice> vertices = new LinkedList<Vertice>();
-
-
-	Grafo(int inicio){//O grafo inicialmente só tem um nó
-		//this.inicio = inicio;
-		Vertice vertice = new Vertice(inicio, 0, 0, 0);//Seria o nó Raiz
-		this.vertices.add(vertice);
+	Grafo(int inicio){//O grafo inicialmente só tem um vértice
+		this.inicio = inicio;
+		Vertice vertice = new Vertice(inicio, 0);//Seria o nó Raiz
+		this.map.put(inicio, vertice);
 	}
 
 	void adicionaVertice(Vertice v){
-		vertices.add(v);
+		map.put(v.getNome(), v);
 	}
 
 	static private int inverte(int num){
@@ -51,7 +39,6 @@ class Grafo{
 		}
 
 		Integer[] numero = new Integer[5];
-
 
 		int i = 0;//Tamanho do número
 		//Rotina que armazena os caracteres de forma invertida no vetor
@@ -72,90 +59,49 @@ class Grafo{
 		return Integer.parseInt(number);
 	}
 
-
-	private void verificaRepeticao(int nome){
-		for(Vertice x: fila){
-			if(x.getNome() == nome){
-				fila.remove(x);
-				return;
-			}
-		}
-	}
-
-	static private boolean qtdAlgarismosIguais(int num1, int num2){
-
-		int j = 0, i = 0;
-		int tamN1 = 0;
-		int tamN2 = 0;
-
-		while (num1 > 0) {
-			j *= 10;
-			j = (num1%10);
-			num1 /= 10;
-			tamN1++;
-		}
-
-		while (num2 > 0) {
-			j *= 10;
-			j = (num2%10);
-			num2 /= 10;
-			tamN2++;
-		}
-
-		if(tamN1 >= tamN2){
-			return true;
-		}else{
-			return false;
-		}
-
-	}
-
 	boolean verificaVerticeExistente(int nome){
-		for(Vertice v: vertices){
-			if(v.getNome() == nome){
-				return false;
-			}
+		if(map.get(nome) == null){
+			return true;
 		}
-		return true;
+		return false;
 	}
 
+	//O grafo é construído de forma muito semelhante a uma árvore
 	int constroi(int vertice){//Percorre o grafo, enquanto cria os vetices
 
-		
-		int indice = 0;
-		int nome;
-		fila.add(vertices.get(0));
+		Queue<Vertice> fila = new LinkedList<>();
+		int nome;//103
+		fila.add(map.get(inicio));
 		
 		while (true) {
 			Vertice v = fila.poll();
-
-			//System.out.print("Sou o vertice " + v.getNome() + " Filho: ");
-
-			//Cria filho da esquerda
+			System.out.print("Sou o vertice: " + v.getNome());
+			//Cria "filho da esquerda"
 			nome = inverte(v.getNome());
-				if(nome != v.getNome() && qtdAlgarismosIguais(nome, v.getNome())){
-					if(verificaVerticeExistente(nome)){//Só vai criar se o vertice não existe
-						Vertice esq = new Vertice(nome, ++indice, v.getId(), v.getAltura()+1);
-						//verificaRepeticao(nome);//Remove da fila algum vertice que vai gerar a mesma arvore
-						//System.out.print("Esq " + nome);
-						adicionaVertice(esq);
-						if(nome == vertice){
-							return esq.getAltura();
-						}
-						fila.add(esq);
+			if(nome != v.getNome()){//Verifica se a inversão é inútil
+				if(verificaVerticeExistente(nome)){//Só vai criar se o vertice não existe
+					Vertice esq = new Vertice(nome, v.getAltura()+1);
+					System.out.print(" Esq: " + nome);
+					adicionaVertice(esq);
+					if(nome == vertice){
+						return esq.getAltura();
 					}
+					fila.add(esq);
 				}
-			
-			//Cria filho da direita
-			nome = v.getNome() + 1;
-			Vertice dir = new Vertice(nome, ++indice, v.getId(), v.getAltura()+1);
-			//verificaRepeticao(nome);//Remove da fila algum vertice que vai gerar a mesma arvore
-			//System.out.println(" Dir " + nome);
-			adicionaVertice(dir);
-			if(nome == vertice){
-				return dir.getAltura();
 			}
-			fila.add(dir);
+		
+			//Cria "filho da direita"
+			nome = v.getNome() + 1;
+			if(verificaVerticeExistente(nome)){
+				Vertice dir = new Vertice(nome, v.getAltura()+1);
+				System.out.print(" Dir: " + nome);
+				adicionaVertice(dir);
+				if(nome == vertice){
+					return dir.getAltura();
+				}
+				fila.add(dir);
+			}
+			System.out.println();
 		}
 	}
 }
@@ -163,7 +109,7 @@ class Grafo{
 
 public class Main{
 
-	public static void main(String[] args) throws FileNotFoundException{
+	public static void main(String[] args){
 
 		Scanner scan = null;
 		int testes;
@@ -176,11 +122,9 @@ public class Main{
 
 		for(int i = 0; i < testes; i++){
 			inicio = scan.nextInt();
-			fim = scan.nextInt();
+			fim = scan.nextInt();//103
 			g = new Grafo(inicio);
-			//System.out.println();
 			System.out.println(g.constroi(fim));
 		}
-		
 	}
 }
