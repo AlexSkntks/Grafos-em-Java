@@ -26,5 +26,10 @@
 - Observe que se arquivo não estiver na mesma pasta, a última parte deve ser o caminho do arquivo (absoluto ou relativo):
 
 	>`java -jar programa.jar /home/fulano/entrada.txt`
+---
+## Alguns problemas do [URI online judge](https://www.urionlinejudge.com.br/) resolvidos:
 
+* [URI-1070](https://github.com/AlexSkntks/Grafos-em-Java/blob/URI-Online-Judge-1076/src/Main.java).
+* [URI-1550](https://github.com/AlexSkntks/Grafos-em-Java/blob/URI-Online-Judge-1550/src/Main.java).
+* [URI-1552](https://github.com/AlexSkntks/Grafos-em-Java/blob/Uri-Online-Judge-1552/Main.java).
 
